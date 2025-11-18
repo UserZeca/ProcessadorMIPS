@@ -4,7 +4,7 @@ Esse trabalho tem como objetivo principal o projeto e a implementação de um pr
 
 O processador conta com um Instruction Set Architecture (ISA) customizado e estendido. O foco desta extensão é a integração de uma Unidade Lógica Aritmética (ULA) de Ponto Flutuante de 32 bits, proveniente do projeto FloPoCo.
 
-O desenvolvimento e a simulação do processador foram realizados utilizando o Quartus II e o ModelSim.
+O desenvolvimento e a simulação do processador foram realizados utilizando o Flopoco (para a ULA de ponto flutuante), Quartus II e o ModelSim, devido a problemas que ocorreu nas tentativas de usar o EDA playground.
 
 ## Detalhes teóricos
 
@@ -34,4 +34,27 @@ Otimização para FPGAs: O FloPoCo é um gerador de cores focado em otimizar a r
 Conversão para 32 bits
 Como o formato de 34 bits é interno do FloPoCo, é necessária uma etapa de conversão na saída da FPU. Esta conversão combina os 2 bits de exceção (exn) com os 32 bits numéricos para gerar o padrão final de 32 bits IEEE-754, garantindo a interoperabilidade com outros componentes do processador.
 
+## Código gravado na nossa ROM
+
+´´´
+# Carrega os valores float (como hex) nos registradores de inteiros
+lui $t0, 0x3F80      # $t0 = 1.0 (float)
+lui $t1, 0x4000      # $t1 = 2.0 (float)
+addi $a0, $zero, 20  # $a0 = endereço base 20
+
+# Salva os floats na Memória de Dados
+sw $t0, 0($a0)       # Salva 1.0 em mem[20]
+sw $t1, 4($a0)       # Salva 2.0 em mem[24]
+
+# Agora, a FPU lê da memória
+l.s $f4, 0($a0)      # Carrega 1.0 em $f4
+l.s $f5, 4($a0)      # Carrega 2.0 em $f5
+
+# Agora, o teste de ALU funciona
+add.s $f4, $f4, $f5  # $f4 = 3.0
+
+´´´
+
 ## Execução do Código
+
+Para executar o projeto utilize o Quartus e execute, abra o projeto, set o arquivo **top-level** o MIPS-Processor e utilize o módulo de simulação com o ModelSim Altera para testar o processador. Para ver corretamente o resultado adicione o sinais internos nos testes, como o sinal de OPCode e o de Function (ambos presentes na Control-Unit), além disso os registradores correspondentes ao teste. 
