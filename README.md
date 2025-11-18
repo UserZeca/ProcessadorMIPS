@@ -1,3 +1,10 @@
+#Integrantes
+
+- Ezequias Kluyvert
+- Matheus Oliveira
+- Rafael Furletti
+- Gabriel Elan
+
 # Trabalho de Arquitetura e Organização de Computadores
 
 Esse trabalho tem como objetivo principal o projeto e a implementação de um processador MIPS de 32 bits.
