@@ -1,0 +1,82 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity tb_MIPS_Processor is
+end entity tb_MIPS_Processor;
+
+architecture test of tb_MIPS_Processor is
+
+    -- 1. Declarar o Componente (Seu processador inteiro)
+    component MIPS_Processor
+        port (
+            Clk : in  std_logic;
+            Rst : in  std_logic
+        );
+    end component;
+
+    -- 2. Sinais do Testbench
+    signal s_Clk : std_logic := '0';
+    signal s_Rst : std_logic := '0';
+
+    -- Constantes do Clock
+    constant CLK_PERIOD : time := 10 ns;
+    constant CLK_HALF   : time := CLK_PERIOD / 2;
+
+begin
+
+    -- 3. Instanciar a UUT (o Processador)
+    u_MIPS_Processor: MIPS_Processor
+        port map (
+            Clk => s_Clk,
+            Rst => s_Rst
+        );
+
+    -- 4. Processo Gerador de Clock
+    clk_proc: process
+    begin
+        loop
+            s_Clk <= '0';
+            wait for CLK_HALF;
+            s_Clk <= '1';
+            wait for CLK_HALF;
+        end loop;
+    end process;
+    
+    -- 5. Processo de Estímulo (Apenas Reset)
+    stim_proc: process
+    begin
+        report "Iniciando simulacao (MIPS_Processor)..." severity note;
+        
+        -- Truque para o 'l.s' funcionar:
+        -- Nós pré-carregamos a Memória de Dados com os 'floats'
+        -- que nosso programa vai ler.
+        --
+        -- O caminho 'u_MIPS_Processor.u_DMem.RAM(5)' acessa o sinal
+        -- INTERNO do processador.
+        --
+        -- mem[20] = 1.0 (float)
+        -- mem[24] = 2.0 (float)
+        --
+        -- Nota: Seu simulador pode precisar de permissão para "forçar"
+        -- sinais internos. ModelSim/Questa fazem isso sem problemas.
+        
+        wait for 1 ns; -- Espera a simulação estabilizar
+        
+        -- 1. Ativa o Reset
+        s_Rst <= '1';
+        wait for CLK_PERIOD;
+        
+        -- 2. Solta o Reset e deixa o processador rodar
+        s_Rst <= '0';
+        report "Processador liberado. Rodando programa..." severity note;
+
+        -- Deixa o processador rodar por 12 ciclos (1 para cada instrução + margem)
+        wait for CLK_PERIOD * 12;
+        
+        -- Fim da simulação
+        report "Simulacao (MIPS_Processor) concluida." severity note;
+        wait;
+        
+    end process stim_proc;
+
+end architecture test;

@@ -1,0 +1,452 @@
+Analysis & Synthesis report for ProcessadorMIPS
+Mon Nov 17 23:32:10 2025
+Quartus II 64-Bit Version 13.1.0 Build 162 10/23/2013 SJ Web Edition
+
+
+---------------------
+; Table of Contents ;
+---------------------
+  1. Legal Notice
+  2. Analysis & Synthesis Summary
+  3. Analysis & Synthesis Settings
+  4. Parallel Compilation
+  5. Analysis & Synthesis Source Files Read
+  6. Analysis & Synthesis Resource Usage Summary
+  7. Analysis & Synthesis Resource Utilization by Entity
+  8. General Register Statistics
+  9. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntAdder_33_f400_uid25:RoundingAdder"
+ 10. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication|IntAdder_42_f400_uid15:Adder_final6_0"
+ 11. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication"
+ 12. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_34_f400_uid20:roundingAdder"
+ 13. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|LZCShifter_28_to_28_counting_32_comb_uid16:LZC_component"
+ 14. Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_27_f400_uid8:fracAdder"
+ 15. Elapsed Time Per Partition
+ 16. Analysis & Synthesis Messages
+
+
+
+----------------
+; Legal Notice ;
+----------------
+Copyright (C) 1991-2013 Altera Corporation
+Your use of Altera Corporation's design tools, logic functions 
+and other software and tools, and its AMPP partner logic 
+functions, and any output files from any of the foregoing 
+(including device programming or simulation files), and any 
+associated documentation or information are expressly subject 
+to the terms and conditions of the Altera Program License 
+Subscription Agreement, Altera MegaCore Function License 
+Agreement, or other applicable license agreement, including, 
+without limitation, that your use is for the sole purpose of 
+programming logic devices manufactured by Altera and sold by 
+Altera or its authorized distributors.  Please refer to the 
+applicable agreement for further details.
+
+
+
++---------------------------------------------------------------------------------+
+; Analysis & Synthesis Summary                                                    ;
++------------------------------------+--------------------------------------------+
+; Analysis & Synthesis Status        ; Successful - Mon Nov 17 23:32:10 2025      ;
+; Quartus II 64-Bit Version          ; 13.1.0 Build 162 10/23/2013 SJ Web Edition ;
+; Revision Name                      ; ProcessadorMIPS                            ;
+; Top-level Entity Name              ; MIPS_Processor                             ;
+; Family                             ; Cyclone IV GX                              ;
+; Total logic elements               ; 0                                          ;
+;     Total combinational functions  ; 0                                          ;
+;     Dedicated logic registers      ; 0                                          ;
+; Total registers                    ; 0                                          ;
+; Total pins                         ; 2                                          ;
+; Total virtual pins                 ; 0                                          ;
+; Total memory bits                  ; 0                                          ;
+; Embedded Multiplier 9-bit elements ; 0                                          ;
+; Total GXB Receiver Channel PCS     ; 0                                          ;
+; Total GXB Receiver Channel PMA     ; 0                                          ;
+; Total GXB Transmitter Channel PCS  ; 0                                          ;
+; Total GXB Transmitter Channel PMA  ; 0                                          ;
+; Total PLLs                         ; 0                                          ;
++------------------------------------+--------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Settings                                                                                        ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Option                                                                     ; Setting            ; Default Value      ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+; Top-level entity name                                                      ; MIPS_Processor     ; ProcessadorMIPS    ;
+; Family name                                                                ; Cyclone IV GX      ; Cyclone IV GX      ;
+; Use smart compilation                                                      ; Off                ; Off                ;
+; Enable parallel Assembler and TimeQuest Timing Analyzer during compilation ; On                 ; On                 ;
+; Enable compact report table                                                ; Off                ; Off                ;
+; Restructure Multiplexers                                                   ; Auto               ; Auto               ;
+; Create Debugging Nodes for IP Cores                                        ; Off                ; Off                ;
+; Preserve fewer node names                                                  ; On                 ; On                 ;
+; Disable OpenCore Plus hardware evaluation                                  ; Off                ; Off                ;
+; Verilog Version                                                            ; Verilog_2001       ; Verilog_2001       ;
+; VHDL Version                                                               ; VHDL_1993          ; VHDL_1993          ;
+; State Machine Processing                                                   ; Auto               ; Auto               ;
+; Safe State Machine                                                         ; Off                ; Off                ;
+; Extract Verilog State Machines                                             ; On                 ; On                 ;
+; Extract VHDL State Machines                                                ; On                 ; On                 ;
+; Ignore Verilog initial constructs                                          ; Off                ; Off                ;
+; Iteration limit for constant Verilog loops                                 ; 5000               ; 5000               ;
+; Iteration limit for non-constant Verilog loops                             ; 250                ; 250                ;
+; Add Pass-Through Logic to Inferred RAMs                                    ; On                 ; On                 ;
+; Infer RAMs from Raw Logic                                                  ; On                 ; On                 ;
+; Parallel Synthesis                                                         ; On                 ; On                 ;
+; DSP Block Balancing                                                        ; Auto               ; Auto               ;
+; NOT Gate Push-Back                                                         ; On                 ; On                 ;
+; Power-Up Don't Care                                                        ; On                 ; On                 ;
+; Remove Redundant Logic Cells                                               ; Off                ; Off                ;
+; Remove Duplicate Registers                                                 ; On                 ; On                 ;
+; Ignore CARRY Buffers                                                       ; Off                ; Off                ;
+; Ignore CASCADE Buffers                                                     ; Off                ; Off                ;
+; Ignore GLOBAL Buffers                                                      ; Off                ; Off                ;
+; Ignore ROW GLOBAL Buffers                                                  ; Off                ; Off                ;
+; Ignore LCELL Buffers                                                       ; Off                ; Off                ;
+; Ignore SOFT Buffers                                                        ; On                 ; On                 ;
+; Limit AHDL Integers to 32 Bits                                             ; Off                ; Off                ;
+; Optimization Technique                                                     ; Balanced           ; Balanced           ;
+; Carry Chain Length                                                         ; 70                 ; 70                 ;
+; Auto Carry Chains                                                          ; On                 ; On                 ;
+; Auto Open-Drain Pins                                                       ; On                 ; On                 ;
+; Perform WYSIWYG Primitive Resynthesis                                      ; Off                ; Off                ;
+; Auto ROM Replacement                                                       ; On                 ; On                 ;
+; Auto RAM Replacement                                                       ; On                 ; On                 ;
+; Auto DSP Block Replacement                                                 ; On                 ; On                 ;
+; Auto Shift Register Replacement                                            ; Auto               ; Auto               ;
+; Allow Shift Register Merging across Hierarchies                            ; Auto               ; Auto               ;
+; Auto Clock Enable Replacement                                              ; On                 ; On                 ;
+; Strict RAM Replacement                                                     ; Off                ; Off                ;
+; Allow Synchronous Control Signals                                          ; On                 ; On                 ;
+; Force Use of Synchronous Clear Signals                                     ; Off                ; Off                ;
+; Auto RAM Block Balancing                                                   ; On                 ; On                 ;
+; Auto RAM to Logic Cell Conversion                                          ; Off                ; Off                ;
+; Auto Resource Sharing                                                      ; Off                ; Off                ;
+; Allow Any RAM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any ROM Size For Recognition                                         ; Off                ; Off                ;
+; Allow Any Shift Register Size For Recognition                              ; Off                ; Off                ;
+; Use LogicLock Constraints during Resource Balancing                        ; On                 ; On                 ;
+; Ignore translate_off and synthesis_off directives                          ; Off                ; Off                ;
+; Timing-Driven Synthesis                                                    ; On                 ; On                 ;
+; Report Parameter Settings                                                  ; On                 ; On                 ;
+; Report Source Assignments                                                  ; On                 ; On                 ;
+; Report Connectivity Checks                                                 ; On                 ; On                 ;
+; Ignore Maximum Fan-Out Assignments                                         ; Off                ; Off                ;
+; Synchronization Register Chain Length                                      ; 2                  ; 2                  ;
+; PowerPlay Power Optimization                                               ; Normal compilation ; Normal compilation ;
+; HDL message level                                                          ; Level2             ; Level2             ;
+; Suppress Register Optimization Related Messages                            ; Off                ; Off                ;
+; Number of Removed Registers Reported in Synthesis Report                   ; 5000               ; 5000               ;
+; Number of Swept Nodes Reported in Synthesis Report                         ; 5000               ; 5000               ;
+; Number of Inverted Registers Reported in Synthesis Report                  ; 100                ; 100                ;
+; Clock MUX Protection                                                       ; On                 ; On                 ;
+; Auto Gated Clock Conversion                                                ; Off                ; Off                ;
+; Block Design Naming                                                        ; Auto               ; Auto               ;
+; SDC constraint protection                                                  ; Off                ; Off                ;
+; Synthesis Effort                                                           ; Auto               ; Auto               ;
+; Shift Register Replacement - Allow Asynchronous Clear Signal               ; On                 ; On                 ;
+; Pre-Mapping Resynthesis Optimization                                       ; Off                ; Off                ;
+; Analysis & Synthesis Message Level                                         ; Medium             ; Medium             ;
+; Disable Register Merging Across Hierarchies                                ; Auto               ; Auto               ;
+; Resource Aware Inference For Block RAM                                     ; On                 ; On                 ;
+; Synthesis Seed                                                             ; 1                  ; 1                  ;
++----------------------------------------------------------------------------+--------------------+--------------------+
+
+
+Parallel compilation was disabled, but you have multiple processors available. Enable parallel compilation to reduce compilation time.
++-------------------------------------+
+; Parallel Compilation                ;
++----------------------------+--------+
+; Processors                 ; Number ;
++----------------------------+--------+
+; Number detected on machine ; 12     ;
+; Maximum allowed            ; 1      ;
++----------------------------+--------+
+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Source Files Read                                                                                                                                                                                         ;
++------------------------------------------------------------------+-----------------+-----------------+---------------------------------------------------------------------------------------------------------------+---------+
+; File Name with User-Entered Path                                 ; Used in Netlist ; File Type       ; File Name with Absolute Path                                                                                  ; Library ;
++------------------------------------------------------------------+-----------------+-----------------+---------------------------------------------------------------------------------------------------------------+---------+
+; db/Register_File/register_file.vhd                               ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/Register_File/register_file.vhd                               ;         ;
+; db/Program_Counter/Program_Counter.vhd                           ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/Program_Counter/Program_Counter.vhd                           ;         ;
+; db/OPMult/OutputIEEE_8_23_to_8_23.vhd                            ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/OutputIEEE_8_23_to_8_23.vhd                            ;         ;
+; db/OPMult/IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4.vhd ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4.vhd ;         ;
+; db/OPMult/IntAdder_42_f400_uid15.vhd                             ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/IntAdder_42_f400_uid15.vhd                             ;         ;
+; db/OPMult/IntAdder_33_f400_uid25.vhd                             ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/IntAdder_33_f400_uid25.vhd                             ;         ;
+; db/OPMult/InputIEEE_8_23_to_8_23.vhd                             ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/InputIEEE_8_23_to_8_23.vhd                             ;         ;
+; db/OPMult/FPMult_32bit_Wrapper.vhd                               ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/FPMult_32bit_Wrapper.vhd                               ;         ;
+; db/OPMult/FPMult_8_23_8_23_8_23_comb_uid2.vhd                    ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPMult/FPMult_8_23_8_23_8_23_comb_uid2.vhd                    ;         ;
+; db/OPAdd/RightShifter_24_by_max_26_comb_uid4.vhd                 ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/RightShifter_24_by_max_26_comb_uid4.vhd                 ;         ;
+; db/OPAdd/LZCShifter_28_to_28_counting_32_comb_uid16.vhd          ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/LZCShifter_28_to_28_counting_32_comb_uid16.vhd          ;         ;
+; db/OPAdd/IntAdder_34_f400_uid20.vhd                              ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/IntAdder_34_f400_uid20.vhd                              ;         ;
+; db/OPAdd/IntAdder_27_f400_uid8.vhd                               ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/IntAdder_27_f400_uid8.vhd                               ;         ;
+; db/OPAdd/FPAdd_32bit_Wrapper.vhd                                 ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/FPAdd_32bit_Wrapper.vhd                                 ;         ;
+; db/OPAdd/FPAdd_8_23_comb_uid2.vhd                                ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/OPAdd/FPAdd_8_23_comb_uid2.vhd                                ;         ;
+; db/MIPS_Processor/MIPS_Processor.vhd                             ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/MIPS_Processor/MIPS_Processor.vhd                             ;         ;
+; db/IntegerALU/Integer_ALU.vhd                                    ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/IntegerALU/Integer_ALU.vhd                                    ;         ;
+; db/Instruction_Memory/Instruction_Memory.vhd                     ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/Instruction_Memory/Instruction_Memory.vhd                     ;         ;
+; db/FP_Register_File/FP_Register_File.vhd                         ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/FP_Register_File/FP_Register_File.vhd                         ;         ;
+; db/Data_Memory/Data_Memory.vhd                                   ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/Data_Memory/Data_Memory.vhd                                   ;         ;
+; db/Control_Unit/Control_Unit.vhd                                 ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/Control_Unit/Control_Unit.vhd                                 ;         ;
+; db/ALU/FP_ALU_Wrapper.vhd                                        ; yes             ; User VHDL File  ; C:/Users/Zeca/Documents/Zeca/AOC-Processador/db/ALU/FP_ALU_Wrapper.vhd                                        ;         ;
++------------------------------------------------------------------+-----------------+-----------------+---------------------------------------------------------------------------------------------------------------+---------+
+
+
++---------------------------------------------+
+; Analysis & Synthesis Resource Usage Summary ;
++--------------------------+------------------+
+; Resource                 ; Usage            ;
++--------------------------+------------------+
+; I/O pins                 ; 2                ;
+; DSP block 9-bit elements ; 0                ;
+; Maximum fan-out node     ; Clk              ;
+; Maximum fan-out          ; 1                ;
+; Total fan-out            ; 2                ;
+; Average fan-out          ; 0.50             ;
++--------------------------+------------------+
+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Analysis & Synthesis Resource Utilization by Entity                                                                                                                                     ;
++----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+-----------+------+--------------+---------------------+--------------+
+; Compilation Hierarchy Node ; LC Combinationals ; LC Registers ; Memory Bits ; DSP Elements ; DSP 9x9 ; DSP 18x18 ; DSP 36x36 ; Pins ; Virtual Pins ; Full Hierarchy Name ; Library Name ;
++----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+-----------+------+--------------+---------------------+--------------+
+; |MIPS_Processor            ; 0 (0)             ; 0 (0)        ; 0           ; 0            ; 0       ; 0         ; 0         ; 2    ; 0            ; |MIPS_Processor     ; work         ;
++----------------------------+-------------------+--------------+-------------+--------------+---------+-----------+-----------+------+--------------+---------------------+--------------+
+Note: For table entries with two numbers listed, the numbers in parentheses indicate the number of resources of the given type used by the specific entity alone. The numbers listed outside of parentheses indicate the total resources of the given type used by the specific entity and all of its sub-entities in the hierarchy.
+
+
++------------------------------------------------------+
+; General Register Statistics                          ;
++----------------------------------------------+-------+
+; Statistic                                    ; Value ;
++----------------------------------------------+-------+
+; Total registers                              ; 0     ;
+; Number of registers using Synchronous Clear  ; 0     ;
+; Number of registers using Synchronous Load   ; 0     ;
+; Number of registers using Asynchronous Clear ; 0     ;
+; Number of registers using Asynchronous Load  ; 0     ;
+; Number of registers using Clock Enable       ; 0     ;
+; Number of registers using Preset             ; 0     ;
++----------------------------------------------+-------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntAdder_33_f400_uid25:RoundingAdder" ;
++------+-------+----------+--------------------------------------------------------------------------------------------------------------------------------------------+
+; Port ; Type  ; Severity ; Details                                                                                                                                    ;
++------+-------+----------+--------------------------------------------------------------------------------------------------------------------------------------------+
+; y    ; Input ; Info     ; Stuck at GND                                                                                                                               ;
++------+-------+----------+--------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication|IntAdder_42_f400_uid15:Adder_final6_0" ;
++-----------+--------+----------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port      ; Type   ; Severity ; Details                                                                                                                                                                                                            ;
++-----------+--------+----------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; x[41]     ; Input  ; Info     ; Stuck at GND                                                                                                                                                                                                       ;
+; y[41..24] ; Input  ; Info     ; Stuck at GND                                                                                                                                                                                                       ;
+; cin       ; Input  ; Info     ; Stuck at GND                                                                                                                                                                                                       ;
+; r[41]     ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed.                                                                                                                                ;
++-----------+--------+----------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication" ;
++-------+-------+----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port  ; Type  ; Severity ; Details                                                                                                                                                                           ;
++-------+-------+----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; x[23] ; Input ; Info     ; Stuck at VCC                                                                                                                                                                      ;
+; y[23] ; Input ; Info     ; Stuck at VCC                                                                                                                                                                      ;
++-------+-------+----------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_34_f400_uid20:roundingAdder" ;
++------+--------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+; Port ; Type   ; Severity ; Details                                                                                                                     ;
++------+--------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+; y    ; Input  ; Info     ; Stuck at GND                                                                                                                ;
+; r[0] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed.                                         ;
++------+--------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|LZCShifter_28_to_28_counting_32_comb_uid16:LZC_component" ;
++-------+--------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port  ; Type   ; Severity ; Details                                                                                                                                        ;
++-------+--------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+; o[27] ; Output ; Info     ; Connected to dangling logic. Logic that only feeds a dangling port will be removed.                                                            ;
++-------+--------+----------+------------------------------------------------------------------------------------------------------------------------------------------------+
+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------+
+; Port Connectivity Checks: "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_27_f400_uid8:fracAdder" ;
++---------+-------+----------+----------------------------------------------------------------------------------------------------------------------+
+; Port    ; Type  ; Severity ; Details                                                                                                              ;
++---------+-------+----------+----------------------------------------------------------------------------------------------------------------------+
+; x[1..0] ; Input ; Info     ; Stuck at GND                                                                                                         ;
+; x[26]   ; Input ; Info     ; Stuck at GND                                                                                                         ;
+; x[25]   ; Input ; Info     ; Stuck at VCC                                                                                                         ;
++---------+-------+----------+----------------------------------------------------------------------------------------------------------------------+
+
+
++-------------------------------+
+; Elapsed Time Per Partition    ;
++----------------+--------------+
+; Partition Name ; Elapsed Time ;
++----------------+--------------+
+; Top            ; 00:00:00     ;
++----------------+--------------+
+
+
++-------------------------------+
+; Analysis & Synthesis Messages ;
++-------------------------------+
+Info: *******************************************************************
+Info: Running Quartus II 64-Bit Analysis & Synthesis
+    Info: Version 13.1.0 Build 162 10/23/2013 SJ Web Edition
+    Info: Processing started: Mon Nov 17 23:32:08 2025
+Info: Command: quartus_map --read_settings_files=on --write_settings_files=off ProcessadorMIPS -c ProcessadorMIPS
+Warning (20028): Parallel compilation is not licensed and has been disabled
+Info (12021): Found 2 design units, including 1 entities, in source file db/register_file/tb_register_file.vhd
+    Info (12022): Found design unit 1: tb_register_file-register_file
+    Info (12023): Found entity 1: tb_register_file
+Info (12021): Found 2 design units, including 1 entities, in source file db/register_file/register_file.vhd
+    Info (12022): Found design unit 1: register_file-behavioral
+    Info (12023): Found entity 1: register_file
+Info (12021): Found 2 design units, including 1 entities, in source file db/program_counter/tb_program_counter.vhd
+    Info (12022): Found design unit 1: tb_Program_Counter-test
+    Info (12023): Found entity 1: tb_Program_Counter
+Info (12021): Found 2 design units, including 1 entities, in source file db/program_counter/program_counter.vhd
+    Info (12022): Found design unit 1: Program_Counter-Behavioral
+    Info (12023): Found entity 1: Program_Counter
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/tb_fpmult_wrapper.vhd
+    Info (12022): Found design unit 1: tb_FPMult_Wrapper-test
+    Info (12023): Found entity 1: tb_FPMult_Wrapper
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/outputieee_8_23_to_8_23.vhd
+    Info (12022): Found design unit 1: OutputIEEE_8_23_to_8_23-arch
+    Info (12023): Found entity 1: OutputIEEE_8_23_to_8_23
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/intmultiplier_usingdsp_24_24_48_unsigned_comb_uid4.vhd
+    Info (12022): Found design unit 1: IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4-arch
+    Info (12023): Found entity 1: IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/intadder_42_f400_uid15.vhd
+    Info (12022): Found design unit 1: IntAdder_42_f400_uid15-arch
+    Info (12023): Found entity 1: IntAdder_42_f400_uid15
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/intadder_33_f400_uid25.vhd
+    Info (12022): Found design unit 1: IntAdder_33_f400_uid25-arch
+    Info (12023): Found entity 1: IntAdder_33_f400_uid25
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/inputieee_8_23_to_8_23.vhd
+    Info (12022): Found design unit 1: InputIEEE_8_23_to_8_23-arch
+    Info (12023): Found entity 1: InputIEEE_8_23_to_8_23
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/fpmult_32bit_wrapper.vhd
+    Info (12022): Found design unit 1: FPMult_32bit_Wrapper-Structural
+    Info (12023): Found entity 1: FPMult_32bit_Wrapper
+Info (12021): Found 2 design units, including 1 entities, in source file db/opmult/fpmult_8_23_8_23_8_23_comb_uid2.vhd
+    Info (12022): Found design unit 1: FPMult_8_23_8_23_8_23_comb_uid2-arch
+    Info (12023): Found entity 1: FPMult_8_23_8_23_8_23_comb_uid2
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/tb_fpadd_wrapper.vhd
+    Info (12022): Found design unit 1: tb_FPAdd_Wrapper-test
+    Info (12023): Found entity 1: tb_FPAdd_Wrapper
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/rightshifter_24_by_max_26_comb_uid4.vhd
+    Info (12022): Found design unit 1: RightShifter_24_by_max_26_comb_uid4-arch
+    Info (12023): Found entity 1: RightShifter_24_by_max_26_comb_uid4
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/lzcshifter_28_to_28_counting_32_comb_uid16.vhd
+    Info (12022): Found design unit 1: LZCShifter_28_to_28_counting_32_comb_uid16-arch
+    Info (12023): Found entity 1: LZCShifter_28_to_28_counting_32_comb_uid16
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/intadder_34_f400_uid20.vhd
+    Info (12022): Found design unit 1: IntAdder_34_f400_uid20-arch
+    Info (12023): Found entity 1: IntAdder_34_f400_uid20
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/intadder_27_f400_uid8.vhd
+    Info (12022): Found design unit 1: IntAdder_27_f400_uid8-arch
+    Info (12023): Found entity 1: IntAdder_27_f400_uid8
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/fpadd_32bit_wrapper.vhd
+    Info (12022): Found design unit 1: FPAdd_32bit_Wrapper-Structural
+    Info (12023): Found entity 1: FPAdd_32bit_Wrapper
+Info (12021): Found 2 design units, including 1 entities, in source file db/opadd/fpadd_8_23_comb_uid2.vhd
+    Info (12022): Found design unit 1: FPAdd_8_23_comb_uid2-arch
+    Info (12023): Found entity 1: FPAdd_8_23_comb_uid2
+Info (12021): Found 2 design units, including 1 entities, in source file db/mips_processor/tb_mips_processor.vhd
+    Info (12022): Found design unit 1: tb_MIPS_Processor-test
+    Info (12023): Found entity 1: tb_MIPS_Processor
+Info (12021): Found 2 design units, including 1 entities, in source file db/mips_processor/mips_processor.vhd
+    Info (12022): Found design unit 1: MIPS_Processor-Structural
+    Info (12023): Found entity 1: MIPS_Processor
+Info (12021): Found 2 design units, including 1 entities, in source file db/integeralu/tb_integer_alu.vhd
+    Info (12022): Found design unit 1: tb_Integer_ALU-test
+    Info (12023): Found entity 1: tb_Integer_ALU
+Info (12021): Found 2 design units, including 1 entities, in source file db/integeralu/integer_alu.vhd
+    Info (12022): Found design unit 1: Integer_ALU-Behavioral
+    Info (12023): Found entity 1: Integer_ALU
+Info (12021): Found 2 design units, including 1 entities, in source file db/instruction_memory/tb_instruction_memory.vhd
+    Info (12022): Found design unit 1: tb_Instruction_Memory-test
+    Info (12023): Found entity 1: tb_Instruction_Memory
+Info (12021): Found 2 design units, including 1 entities, in source file db/instruction_memory/instruction_memory.vhd
+    Info (12022): Found design unit 1: Instruction_Memory-Behavioral
+    Info (12023): Found entity 1: Instruction_Memory
+Info (12021): Found 2 design units, including 1 entities, in source file db/fp_register_file/tb_fp_register_file.vhd
+    Info (12022): Found design unit 1: tb_FP_Register_File-test
+    Info (12023): Found entity 1: tb_FP_Register_File
+Info (12021): Found 2 design units, including 1 entities, in source file db/fp_register_file/fp_register_file.vhd
+    Info (12022): Found design unit 1: FP_Register_File-Behavioral
+    Info (12023): Found entity 1: FP_Register_File
+Info (12021): Found 2 design units, including 1 entities, in source file db/data_memory/tb_data_memory.vhd
+    Info (12022): Found design unit 1: tb_Data_Memory-test
+    Info (12023): Found entity 1: tb_Data_Memory
+Info (12021): Found 2 design units, including 1 entities, in source file db/data_memory/data_memory.vhd
+    Info (12022): Found design unit 1: Data_Memory-Behavioral
+    Info (12023): Found entity 1: Data_Memory
+Info (12021): Found 2 design units, including 1 entities, in source file db/control_unit/tb_control_unit.vhd
+    Info (12022): Found design unit 1: tb_Control_Unit-test
+    Info (12023): Found entity 1: tb_Control_Unit
+Info (12021): Found 2 design units, including 1 entities, in source file db/control_unit/control_unit.vhd
+    Info (12022): Found design unit 1: Control_Unit-Behavioral
+    Info (12023): Found entity 1: Control_Unit
+Info (12021): Found 2 design units, including 1 entities, in source file db/alu/tb_fp_alu_wrapper.vhd
+    Info (12022): Found design unit 1: tb_FP_ALU_Wrapper-test
+    Info (12023): Found entity 1: tb_FP_ALU_Wrapper
+Info (12021): Found 2 design units, including 1 entities, in source file db/alu/fp_alu_wrapper.vhd
+    Info (12022): Found design unit 1: FP_ALU_Wrapper-Structural
+    Info (12023): Found entity 1: FP_ALU_Wrapper
+Info (12127): Elaborating entity "MIPS_Processor" for the top level hierarchy
+Info (12128): Elaborating entity "Program_Counter" for hierarchy "Program_Counter:u_PC"
+Info (12128): Elaborating entity "Instruction_Memory" for hierarchy "Instruction_Memory:u_IMem"
+Info (12128): Elaborating entity "Control_Unit" for hierarchy "Control_Unit:u_Ctrl"
+Info (12128): Elaborating entity "register_file" for hierarchy "register_file:u_Int_Reg_File"
+Info (12128): Elaborating entity "FP_Register_File" for hierarchy "FP_Register_File:u_FP_Reg_File"
+Info (12128): Elaborating entity "Integer_ALU" for hierarchy "Integer_ALU:u_Int_ALU"
+Info (12128): Elaborating entity "FP_ALU_Wrapper" for hierarchy "FP_ALU_Wrapper:u_FP_ALU"
+Info (12128): Elaborating entity "FPAdd_32bit_Wrapper" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd"
+Info (12128): Elaborating entity "InputIEEE_8_23_to_8_23" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|InputIEEE_8_23_to_8_23:u_Input_X"
+Info (12128): Elaborating entity "FPAdd_8_23_comb_uid2" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core"
+Warning (10036): Verilog HDL or VHDL warning at FPAdd_8_23_comb_uid2.vhd(53): object "sdExnXY" assigned a value but never read
+Info (12128): Elaborating entity "RightShifter_24_by_max_26_comb_uid4" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|RightShifter_24_by_max_26_comb_uid4:RightShifterComponent"
+Info (12128): Elaborating entity "IntAdder_27_f400_uid8" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_27_f400_uid8:fracAdder"
+Info (12128): Elaborating entity "LZCShifter_28_to_28_counting_32_comb_uid16" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|LZCShifter_28_to_28_counting_32_comb_uid16:LZC_component"
+Info (12128): Elaborating entity "IntAdder_34_f400_uid20" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|FPAdd_8_23_comb_uid2:u_FPAdd_Core|IntAdder_34_f400_uid20:roundingAdder"
+Info (12128): Elaborating entity "OutputIEEE_8_23_to_8_23" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPAdd_32bit_Wrapper:u_FPAdd|OutputIEEE_8_23_to_8_23:u_Output_R"
+Info (12128): Elaborating entity "FPMult_32bit_Wrapper" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult"
+Info (12128): Elaborating entity "FPMult_8_23_8_23_8_23_comb_uid2" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core"
+Info (12128): Elaborating entity "IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication"
+Info (12128): Elaborating entity "IntAdder_42_f400_uid15" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4:SignificandMultiplication|IntAdder_42_f400_uid15:Adder_final6_0"
+Info (12128): Elaborating entity "IntAdder_33_f400_uid25" for hierarchy "FP_ALU_Wrapper:u_FP_ALU|FPMult_32bit_Wrapper:u_FPMult|FPMult_8_23_8_23_8_23_comb_uid2:u_FPMult_Core|IntAdder_33_f400_uid25:RoundingAdder"
+Info (12128): Elaborating entity "Data_Memory" for hierarchy "Data_Memory:u_DMem"
+Info (16010): Generating hard_block partition "hard_block:auto_generated_inst"
+    Info (16011): Adding 0 node(s), including 0 DDIO, 0 PLL, 0 transceiver and 0 LCELL
+Warning (21074): Design contains 2 input pin(s) that do not drive logic
+    Warning (15610): No output dependent on input pin "Clk"
+    Warning (15610): No output dependent on input pin "Rst"
+Info (21057): Implemented 2 device resources after synthesis - the final resource count might be different
+    Info (21058): Implemented 2 input pins
+    Info (21059): Implemented 0 output pins
+Info: Quartus II 64-Bit Analysis & Synthesis was successful. 0 errors, 5 warnings
+    Info: Peak virtual memory: 4727 megabytes
+    Info: Processing ended: Mon Nov 17 23:32:10 2025
+    Info: Elapsed time: 00:00:02
+    Info: Total CPU time (on all processors): 00:00:02
+
+

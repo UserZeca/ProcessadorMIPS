@@ -1,0 +1,150 @@
+library ieee;
+use ieee.std_logic_1164.all;
+
+-- A "Unidade de Controle" (Cérebro) do processador MIPS.
+-- Decodifica a instrução e gera todos os sinais de controle.
+entity Control_Unit is
+    port (
+        -- Entrada: A instrução (ou partes dela)
+        Opcode : in  std_logic_vector(5 downto 0); -- Instrução[31-26]
+        Funct  : in  std_logic_vector(5 downto 0); -- Instrução[5-0]
+        
+        -- Saídas: Sinais de controle para o Datapath
+        
+        -- Controle do Banco de Registradores
+        RegWrite : out std_logic; -- '1' = Habilita escrita no Banco de Reg.
+        RegDst   : out std_logic; -- '0' = Escreve em 'rt', '1' = Escreve em 'rd'
+        
+        -- Controle da Lógica de Desvio (Branch/Jump)
+        Branch   : out std_logic; -- '1' = Habilita desvio 'beq'
+        Jump     : out std_logic; -- '1' = Habilita desvio 'j'
+        
+        -- Controle da Memória de Dados
+        MemWrite : out std_logic; -- '1' = Habilita escrita na Memória
+        MemRead  : out std_logic; -- '1' = Habilita leitura da Memória
+        
+        -- Controle de Seleção do MUX da ALU de Inteiros
+        ALUSrc   : out std_logic; -- '0' = Usa Reg[rt], '1' = Usa Imediato
+        
+        -- Controle da ALU de Inteiros (para Integer_ALU.vhd)
+        ALU_Sel  : out std_logic_vector(3 downto 0);
+        
+        -- Controle da ALU de Ponto Flutuante (para FP_ALU_Wrapper.vhd)
+        FP_Op_Sel : out std_logic; -- '0' = ADD.S, '1' = MUL.S
+        
+        -- Controle do MUX de "Write Back" (o que vai pro RegFile)
+        WriteBack_Sel : out std_logic_vector(1 downto 0) 
+        -- "00" = Resultado da ALU Inteiros
+        -- "01" = Resultado da Memória de Dados (lw)
+        -- "10" = Resultado da ALU Ponto Flutuante
+    );
+end entity Control_Unit;
+
+architecture Behavioral of Control_Unit is
+begin
+    
+    -- Processo combinacional principal
+    process(Opcode, Funct)
+    begin
+        -- 1. Inicializa todos os sinais com valores "seguros" (Idle/NOP)
+        RegWrite      <= '0';
+        RegDst        <= '0';
+        Branch        <= '0';
+        Jump          <= '0';
+        MemWrite      <= '0';
+        MemRead       <= '0';
+        ALUSrc        <= '0';
+        ALU_Sel       <= "XXXX"; -- 'Don't care'
+        FP_Op_Sel     <= 'X';    -- 'Don't care'
+        WriteBack_Sel <= "XX";  -- 'Don't care'
+
+        -- 2. Decodifica o OPcode
+        case Opcode is
+        
+            -- =============================================
+            -- === TIPO-R (add, sub, and, or, slt, nor) ===
+            -- =============================================
+            when "000000" => 
+                RegWrite      <= '1';
+                RegDst        <= '1';
+                ALUSrc        <= '0';
+                WriteBack_Sel <= "00"; -- Resultado da ALU Inteiros
+                
+                -- Decodifica o campo 'Funct'
+                case Funct is
+                    when "100000" => ALU_Sel <= "0010"; -- add
+                    when "100010" => ALU_Sel <= "0110"; -- sub
+                    when "100100" => ALU_Sel <= "0000"; -- and
+                    when "100101" => ALU_Sel <= "0001"; -- or
+                    when "101010" => ALU_Sel <= "0111"; -- slt
+                    when "100111" => ALU_Sel <= "1100"; -- nor
+                    when others   => ALU_Sel <= "XXXX"; -- NOP/Inválido
+                end case;
+                
+            -- =============================================
+            -- === TIPO-I (lw, sw, beq, addi) ===
+            -- =============================================
+            
+            -- lw (load word)
+            when "100011" =>
+                RegWrite      <= '1';
+                ALUSrc        <= '1'; -- Usa imediato
+                MemRead       <= '1';
+                ALU_Sel       <= "0010"; -- ADD (para calcular endereço)
+                WriteBack_Sel <= "01"; -- Resultado da Memória
+
+            -- sw (store word)
+            when "101011" =>
+                MemWrite      <= '1';
+                ALUSrc        <= '1'; -- Usa imediato
+                ALU_Sel       <= "0010"; -- ADD (para calcular endereço)
+                -- (RegWrite é '0')
+
+            -- beq (branch if equal)
+            when "000100" =>
+                Branch        <= '1';
+                ALUSrc        <= '0'; -- Compara dois registradores
+                ALU_Sel       <= "0110"; -- SUB (para checar se R = 0)
+                -- (RegWrite é '0')
+
+            -- addi (add immediate)
+            when "001000" =>
+                RegWrite      <= '1';
+                ALUSrc        <= '1'; -- Usa imediato
+                ALU_Sel       <= "0010"; -- ADD
+                WriteBack_Sel <= "00"; -- Resultado da ALU Inteiros
+                
+            -- =============================================
+            -- === TIPO-J (jump) ===
+            -- =============================================
+            when "000010" =>
+                Jump <= '1';
+                -- (Resto é '0')
+
+            -- =============================================
+            -- === PONTO FLUTUANTE (cop1) - ISA Estendida ===
+            -- =============================================
+            when "010001" =>
+                RegWrite      <= '1';
+                RegDst        <= '1'; -- Assume FPU usa 'rd'
+                ALUSrc        <= '0'; -- Usa dois registradores
+                WriteBack_Sel <= "10"; -- Resultado da ALU Ponto Flutuante
+                
+                -- Decodifica o campo 'Funct'
+                case Funct is
+                    when "000000" => FP_Op_Sel <= '0'; -- add.s
+                    when "000010" => FP_Op_Sel <= '1'; -- mul.s
+                    when others   => FP_Op_Sel <= 'X'; -- NOP/Inválido
+                end case;
+            
+            -- =============================================
+            -- === Outras Instruções ===
+            -- =============================================
+            when others =>
+                -- NOP (Não faz nada)
+                null;
+                
+        end case;
+    end process;
+
+end architecture Behavioral;

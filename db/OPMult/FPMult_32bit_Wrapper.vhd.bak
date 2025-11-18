@@ -1,0 +1,524 @@
+----------------------------------------------------------------------------------
+-- Este arquivo VHDL combina todos os componentes FloPoCo necessários
+-- para um multiplicador de ponto flutuante de precisão simples (32 bits).
+--
+-- A nova entidade "top-level" para o seu projeto é:
+--   FPMult_32bit_Wrapper
+--
+-- Ela "empacota" os seguintes componentes:
+-- 1. InputIEEE_8_23_to_8_23 (Conversor 32-bit -> 34-bit)
+-- 2. OutputIEEE_8_23_to_8_23 (Conversor 34-bit -> 32-bit)
+-- 3. FPMult_8_23_8_23_8_23_comb_uid2 (O núcleo multiplicador de 34-bit)
+-- 4. Suas dependências (IntMultiplier, IntAdder, etc.)
+----------------------------------------------------------------------------------
+
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.std_logic_arith.all;
+use ieee.std_logic_unsigned.all;
+library std;
+use std.textio.all;
+library work;
+
+----------------------------------------------------------------------------------
+-- Componente 1: InputIEEE_8_23_to_8_23
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+entity InputIEEE_8_23_to_8_23 is
+   port ( X : in  std_logic_vector(31 downto 0);
+          R : out  std_logic_vector(8+23+2 downto 0)   );
+end entity;
+
+architecture arch of InputIEEE_8_23_to_8_23 is
+signal expX :  std_logic_vector(7 downto 0);
+signal fracX :  std_logic_vector(22 downto 0);
+signal sX :  std_logic;
+signal expZero :  std_logic;
+signal expInfty :  std_logic;
+signal fracZero :  std_logic;
+signal reprSubNormal :  std_logic;
+signal sfracX :  std_logic_vector(22 downto 0);
+signal fracR :  std_logic_vector(22 downto 0);
+signal expR :  std_logic_vector(7 downto 0);
+signal infinity :  std_logic;
+signal zero :  std_logic;
+signal NaN :  std_logic;
+signal exnR :  std_logic_vector(1 downto 0);
+begin
+   expX  <= X(30 downto 23);
+   fracX  <= X(22 downto 0);
+   sX  <= X(31);
+   expZero  <= '1' when expX = (7 downto 0 => '0') else '0';
+   expInfty  <= '1' when expX = (7 downto 0 => '1') else '0';
+   fracZero <= '1' when fracX = (22 downto 0 => '0') else '0';
+   reprSubNormal <= fracX(22);
+   -- since we have one more exponent value than IEEE (field 0...0, value emin-1),
+   -- we can represent subnormal numbers whose mantissa field begins with a 1
+   sfracX <= fracX(21 downto 0) & '0' when (expZero='1' and reprSubNormal='1')    else fracX;
+   fracR <= sfracX;
+   -- copy exponent. This will be OK even for subnormals, zero and infty since in such cases the exn bits will prevail
+   expR <= expX;
+   infinity <= expInfty and fracZero;
+   zero <= expZero and not reprSubNormal;
+   NaN <= expInfty and not fracZero;
+   exnR <= 
+           "00" when zero='1' 
+      else "10" when infinity='1' 
+      else "11" when NaN='1' 
+      else "01" ;  -- normal number
+   R <= exnR & sX & expR & fracR; 
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 2: OutputIEEE_8_23_to_8_23
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+entity OutputIEEE_8_23_to_8_23 is
+   port ( X : in  std_logic_vector(8+23+2 downto 0);
+          R : out  std_logic_vector(31 downto 0)   );
+end entity;
+
+architecture arch of OutputIEEE_8_23_to_8_23 is
+signal expX :  std_logic_vector(7 downto 0);
+signal fracX :  std_logic_vector(22 downto 0);
+signal exnX :  std_logic_vector(1 downto 0);
+signal sX :  std_logic;
+signal expZero :  std_logic;
+signal sfracX :  std_logic_vector(22 downto 0);
+signal fracR :  std_logic_vector(22 downto 0);
+signal expR :  std_logic_vector(7 downto 0);
+begin
+   expX  <= X(30 downto 23);
+   fracX  <= X(22 downto 0);
+   exnX  <= X(33 downto 32);
+   sX  <= X(31) when (exnX = "01" or exnX = "10" or exnX = "00") else '0';
+   expZero  <= '1' when expX = (7 downto 0 => '0') else '0';
+   -- since we have one more exponent value than IEEE (field 0...0, value emin-1),
+   -- we can represent subnormal numbers whose mantissa field begins with a 1
+   sfracX <= 
+      (22 downto 0 => '0') when (exnX = "00") else
+      '1' & fracX(22 downto 1) when (expZero = '1' and exnX = "01") else
+      fracX when (exnX = "01") else 
+      (22 downto 1 => '0') & exnX(0);
+   fracR <= sfracX;
+   expR <=  
+      (7 downto 0 => '0') when (exnX = "00") else
+      expX when (exnX = "01") else 
+      (7 downto 0 => '1');
+   R <= sX & expR & fracR; 
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 3: IntAdder_42_f400_uid15 (Dependência)
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+entity IntAdder_42_f400_uid15 is
+   port ( X : in  std_logic_vector(41 downto 0);
+          Y : in  std_logic_vector(41 downto 0);
+          Cin : in  std_logic;
+          R : out  std_logic_vector(41 downto 0)   );
+end entity;
+
+architecture arch of IntAdder_42_f400_uid15 is
+begin
+   --Classical
+    R <= X + Y + Cin;
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 4: IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4 (Dependência)
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+use ieee.numeric_std.all;
+library std;
+use std.textio.all;
+library work;
+
+entity IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4 is
+   port ( X : in  std_logic_vector(23 downto 0);
+          Y : in  std_logic_vector(23 downto 0);
+          R : out  std_logic_vector(47 downto 0)   );
+end entity;
+
+architecture arch of IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4 is
+   component IntAdder_42_f400_uid15 is
+      port ( X : in  std_logic_vector(41 downto 0);
+             Y : in  std_logic_vector(41 downto 0);
+             Cin : in  std_logic;
+             R : out  std_logic_vector(41 downto 0)   );
+   end component;
+signal XX_m5 :  std_logic_vector(23 downto 0);
+signal YY_m5 :  std_logic_vector(23 downto 0);
+signal DSP_bh6_ch0_0 :  std_logic_vector(40 downto 0);
+signal heap_bh6_w47_0 :  std_logic;
+signal heap_bh6_w46_0 :  std_logic;
+signal heap_bh6_w45_0 :  std_logic;
+signal heap_bh6_w44_0 :  std_logic;
+signal heap_bh6_w43_0 :  std_logic;
+signal heap_bh6_w42_0 :  std_logic;
+signal heap_bh6_w41_0 :  std_logic;
+signal heap_bh6_w40_0 :  std_logic;
+signal heap_bh6_w39_0 :  std_logic;
+signal heap_bh6_w38_0 :  std_logic;
+signal heap_bh6_w37_0 :  std_logic;
+signal heap_bh6_w36_0 :  std_logic;
+signal heap_bh6_w35_0 :  std_logic;
+signal heap_bh6_w34_0 :  std_logic;
+signal heap_bh6_w33_0 :  std_logic;
+signal heap_bh6_w32_0 :  std_logic;
+signal heap_bh6_w31_0 :  std_logic;
+signal heap_bh6_w30_0 :  std_logic;
+signal heap_bh6_w29_0 :  std_logic;
+signal heap_bh6_w28_0 :  std_logic;
+signal heap_bh6_w27_0 :  std_logic;
+signal heap_bh6_w26_0 :  std_logic;
+signal heap_bh6_w25_0 :  std_logic;
+signal heap_bh6_w24_0 :  std_logic;
+signal heap_bh6_w23_0 :  std_logic;
+signal heap_bh6_w22_0 :  std_logic;
+signal heap_bh6_w21_0 :  std_logic;
+signal heap_bh6_w20_0 :  std_logic;
+signal heap_bh6_w19_0 :  std_logic;
+signal heap_bh6_w18_0 :  std_logic;
+signal heap_bh6_w17_0 :  std_logic;
+signal heap_bh6_w16_0 :  std_logic;
+signal heap_bh6_w15_0 :  std_logic;
+signal heap_bh6_w14_0 :  std_logic;
+signal heap_bh6_w13_0 :  std_logic;
+signal heap_bh6_w12_0 :  std_logic;
+signal heap_bh6_w11_0 :  std_logic;
+signal heap_bh6_w10_0 :  std_logic;
+signal heap_bh6_w9_0 :  std_logic;
+signal heap_bh6_w8_0 :  std_logic;
+signal heap_bh6_w7_0 :  std_logic;
+signal DSP_bh6_ch1_0 :  std_logic_vector(40 downto 0);
+signal heap_bh6_w30_1 :  std_logic;
+signal heap_bh6_w29_1 :  std_logic;
+signal heap_bh6_w28_1 :  std_logic;
+signal heap_bh6_w27_1 :  std_logic;
+signal heap_bh6_w26_1 :  std_logic;
+signal heap_bh6_w25_1 :  std_logic;
+signal heap_bh6_w24_1 :  std_logic;
+signal heap_bh6_w23_1 :  std_logic;
+signal heap_bh6_w22_1 :  std_logic;
+signal heap_bh6_w21_1 :  std_logic;
+signal heap_bh6_w20_1 :  std_logic;
+signal heap_bh6_w19_1 :  std_logic;
+signal heap_bh6_w18_1 :  std_logic;
+signal heap_bh6_w17_1 :  std_logic;
+signal heap_bh6_w16_1 :  std_logic;
+signal heap_bh6_w15_1 :  std_logic;
+signal heap_bh6_w14_1 :  std_logic;
+signal heap_bh6_w13_1 :  std_logic;
+signal heap_bh6_w12_1 :  std_logic;
+signal heap_bh6_w11_1 :  std_logic;
+signal heap_bh6_w10_1 :  std_logic;
+signal heap_bh6_w9_1 :  std_logic;
+signal heap_bh6_w8_1 :  std_logic;
+signal heap_bh6_w7_1 :  std_logic;
+signal heap_bh6_w6_0 :  std_logic;
+signal heap_bh6_w5_0 :  std_logic;
+signal heap_bh6_w4_0 :  std_logic;
+signal heap_bh6_w3_0 :  std_logic;
+signal heap_bh6_w2_0 :  std_logic;
+signal heap_bh6_w1_0 :  std_logic;
+signal heap_bh6_w0_0 :  std_logic;
+signal finalAdderIn0_bh6 :  std_logic_vector(41 downto 0);
+signal finalAdderIn1_bh6 :  std_logic_vector(41 downto 0);
+signal finalAdderCin_bh6 :  std_logic;
+signal finalAdderOut_bh6 :  std_logic_vector(41 downto 0);
+signal tempR_bh6_0 :  std_logic_vector(6 downto 0);
+signal CompressionResult6 :  std_logic_vector(48 downto 0);
+begin
+   XX_m5 <= X ;
+   YY_m5 <= Y ;
+   
+   -- Beginning of code generated by BitHeap::generateCompressorVHDL
+   -- code generated by BitHeap::generateSupertileVHDL()
+   DSP_bh6_ch0_0 <= std_logic_vector(unsigned("" & XX_m5(23 downto 0) & "") * unsigned("" & YY_m5(23 downto 7) & ""));
+   heap_bh6_w47_0 <= DSP_bh6_ch0_0(40); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w46_0 <= DSP_bh6_ch0_0(39); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w45_0 <= DSP_bh6_ch0_0(38); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w44_0 <= DSP_bh6_ch0_0(37); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w43_0 <= DSP_bh6_ch0_0(36); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w42_0 <= DSP_bh6_ch0_0(35); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w41_0 <= DSP_bh6_ch0_0(34); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w40_0 <= DSP_bh6_ch0_0(33); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w39_0 <= DSP_bh6_ch0_0(32); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w38_0 <= DSP_bh6_ch0_0(31); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w37_0 <= DSP_bh6_ch0_0(30); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w36_0 <= DSP_bh6_ch0_0(29); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w35_0 <= DSP_bh6_ch0_0(28); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w34_0 <= DSP_bh6_ch0_0(27); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w33_0 <= DSP_bh6_ch0_0(26); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w32_0 <= DSP_bh6_ch0_0(25); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w31_0 <= DSP_bh6_ch0_0(24); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w30_0 <= DSP_bh6_ch0_0(23); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w29_0 <= DSP_bh6_ch0_0(22); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w28_0 <= DSP_bh6_ch0_0(21); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w27_0 <= DSP_bh6_ch0_0(20); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w26_0 <= DSP_bh6_ch0_0(19); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w25_0 <= DSP_bh6_ch0_0(18); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w24_0 <= DSP_bh6_ch0_0(17); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w23_0 <= DSP_bh6_ch0_0(16); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w22_0 <= DSP_bh6_ch0_0(15); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w21_0 <= DSP_bh6_ch0_0(14); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w20_0 <= DSP_bh6_ch0_0(13); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w19_0 <= DSP_bh6_ch0_0(12); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w18_0 <= DSP_bh6_ch0_0(11); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w17_0 <= DSP_bh6_ch0_0(10); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w16_0 <= DSP_bh6_ch0_0(9); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w15_0 <= DSP_bh6_ch0_0(8); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w14_0 <= DSP_bh6_ch0_0(7); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w13_0 <= DSP_bh6_ch0_0(6); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w12_0 <= DSP_bh6_ch0_0(5); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w11_0 <= DSP_bh6_ch0_0(4); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w10_0 <= DSP_bh6_ch0_0(3); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w9_0 <= DSP_bh6_ch0_0(2); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w8_0 <= DSP_bh6_ch0_0(1); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w7_0 <= DSP_bh6_ch0_0(0); -- cycle= 0 cp= 2.387e-09
+   DSP_bh6_ch1_0 <= std_logic_vector(unsigned("" & XX_m5(23 downto 0) & "") * unsigned("" & YY_m5(6 downto 0) & "0000000000"));
+   heap_bh6_w30_1 <= DSP_bh6_ch1_0(40); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w29_1 <= DSP_bh6_ch1_0(39); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w28_1 <= DSP_bh6_ch1_0(38); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w27_1 <= DSP_bh6_ch1_0(37); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w26_1 <= DSP_bh6_ch1_0(36); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w25_1 <= DSP_bh6_ch1_0(35); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w24_1 <= DSP_bh6_ch1_0(34); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w23_1 <= DSP_bh6_ch1_0(33); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w22_1 <= DSP_bh6_ch1_0(32); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w21_1 <= DSP_bh6_ch1_0(31); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w20_1 <= DSP_bh6_ch1_0(30); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w19_1 <= DSP_bh6_ch1_0(29); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w18_1 <= DSP_bh6_ch1_0(28); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w17_1 <= DSP_bh6_ch1_0(27); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w16_1 <= DSP_bh6_ch1_0(26); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w15_1 <= DSP_bh6_ch1_0(25); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w14_1 <= DSP_bh6_ch1_0(24); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w13_1 <= DSP_bh6_ch1_0(23); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w12_1 <= DSP_bh6_ch1_0(22); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w11_1 <= DSP_bh6_ch1_0(21); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w10_1 <= DSP_bh6_ch1_0(20); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w9_1 <= DSP_bh6_ch1_0(19); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w8_1 <= DSP_bh6_ch1_0(18); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w7_1 <= DSP_bh6_ch1_0(17); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w6_0 <= DSP_bh6_ch1_0(16); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w5_0 <= DSP_bh6_ch1_0(15); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w4_0 <= DSP_bh6_ch1_0(14); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w3_0 <= DSP_bh6_ch1_0(13); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w2_0 <= DSP_bh6_ch1_0(12); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w1_0 <= DSP_bh6_ch1_0(11); -- cycle= 0 cp= 2.387e-09
+   heap_bh6_w0_0 <= DSP_bh6_ch1_0(10); -- cycle= 0 cp= 2.387e-09
+
+   -- Adding the constant bits
+      -- All the constant bits are zero, nothing to add
+
+   finalAdderIn0_bh6 <= "0" & heap_bh6_w47_0 & heap_bh6_w46_0 & heap_bh6_w45_0 & heap_bh6_w44_0 & heap_bh6_w43_0 & heap_bh6_w42_0 & heap_bh6_w41_0 & heap_bh6_w40_0 & heap_bh6_w39_0 & heap_bh6_w38_0 & heap_bh6_w37_0 & heap_bh6_w36_0 & heap_bh6_w35_0 & heap_bh6_w34_0 & heap_bh6_w33_0 & heap_bh6_w32_0 & heap_bh6_w31_0 & heap_bh6_w30_1 & heap_bh6_w29_1 & heap_bh6_w28_1 & heap_bh6_w27_1 & heap_bh6_w26_1 & heap_bh6_w25_1 & heap_bh6_w24_1 & heap_bh6_w23_1 & heap_bh6_w22_1 & heap_bh6_w21_1 & heap_bh6_w20_1 & heap_bh6_w19_1 & heap_bh6_w18_1 & heap_bh6_w17_1 & heap_bh6_w16_1 & heap_bh6_w15_1 & heap_bh6_w14_1 & heap_bh6_w13_1 & heap_bh6_w12_1 & heap_bh6_w11_1 & heap_bh6_w10_1 & heap_bh6_w9_1 & heap_bh6_w8_1 & heap_bh6_w7_1;
+   finalAdderIn1_bh6 <= "0" & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & '0' & heap_bh6_w30_0 & heap_bh6_w29_0 & heap_bh6_w28_0 & heap_bh6_w27_0 & heap_bh6_w26_0 & heap_bh6_w25_0 & heap_bh6_w24_0 & heap_bh6_w23_0 & heap_bh6_w22_0 & heap_bh6_w21_0 & heap_bh6_w20_0 & heap_bh6_w19_0 & heap_bh6_w18_0 & heap_bh6_w17_0 & heap_bh6_w16_0 & heap_bh6_w15_0 & heap_bh6_w14_0 & heap_bh6_w13_0 & heap_bh6_w12_0 & heap_bh6_w11_0 & heap_bh6_w10_0 & heap_bh6_w9_0 & heap_bh6_w8_0 & heap_bh6_w7_0;
+   finalAdderCin_bh6 <= '0';
+      Adder_final6_0: IntAdder_42_f400_uid15
+      port map ( Cin => finalAdderCin_bh6,
+                 R => finalAdderOut_bh6,
+                 X => finalAdderIn0_bh6,
+                 Y => finalAdderIn1_bh6);
+   tempR_bh6_0 <= heap_bh6_w6_0 & heap_bh6_w5_0 & heap_bh6_w4_0 & heap_bh6_w3_0 & heap_bh6_w2_0 & heap_bh6_w1_0 & heap_bh6_w0_0; -- already compressed
+   -- concatenate all the compressed chunks
+   CompressionResult6 <= finalAdderOut_bh6 & tempR_bh6_0;
+   -- End of code generated by BitHeap::generateCompressorVHDL
+   R <= CompressionResult6(47 downto 0);
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 5: IntAdder_33_f400_uid25 (Dependência)
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+entity IntAdder_33_f400_uid25 is
+   port ( X : in  std_logic_vector(32 downto 0);
+          Y : in  std_logic_vector(32 downto 0);
+          Cin : in  std_logic;
+          R : out  std_logic_vector(32 downto 0)   );
+end entity;
+
+architecture arch of IntAdder_33_f400_uid25 is
+begin
+   --Classical
+    R <= X + Y + Cin;
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 6: FPMult_8_23_8_23_8_23_comb_uid2 (Núcleo Multiplicador)
+-- (Fornecido pelo usuário)
+----------------------------------------------------------------------------------
+entity FPMult_8_23_8_23_8_23_comb_uid2 is
+   port ( X : in  std_logic_vector(8+23+2 downto 0);
+          Y : in  std_logic_vector(8+23+2 downto 0);
+          R : out  std_logic_vector(8+23+2 downto 0)   );
+end entity;
+
+architecture arch of FPMult_8_23_8_23_8_23_comb_uid2 is
+   component IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4 is
+      port ( X : in  std_logic_vector(23 downto 0);
+             Y : in  std_logic_vector(23 downto 0);
+             R : out  std_logic_vector(47 downto 0)   );
+   end component;
+
+   component IntAdder_33_f400_uid25 is
+      port ( X : in  std_logic_vector(32 downto 0);
+             Y : in  std_logic_vector(32 downto 0);
+             Cin : in  std_logic;
+             R : out  std_logic_vector(32 downto 0)   );
+   end component;
+signal sign :  std_logic;
+signal expX :  std_logic_vector(7 downto 0);
+signal expY :  std_logic_vector(7 downto 0);
+signal expSumPreSub :  std_logic_vector(9 downto 0);
+signal bias :  std_logic_vector(9 downto 0);
+signal expSum :  std_logic_vector(9 downto 0);
+signal sigX :  std_logic_vector(23 downto 0);
+signal sigY :  std_logic_vector(23 downto 0);
+signal sigProd :  std_logic_vector(47 downto 0);
+signal excSel :  std_logic_vector(3 downto 0);
+signal exc :  std_logic_vector(1 downto 0);
+signal norm :  std_logic;
+signal expPostNorm :  std_logic_vector(9 downto 0);
+signal sigProdExt :  std_logic_vector(47 downto 0);
+signal expSig :  std_logic_vector(32 downto 0);
+signal sticky :  std_logic;
+signal guard :  std_logic;
+signal round :  std_logic;
+signal expSigPostRound :  std_logic_vector(32 downto 0);
+signal excPostNorm :  std_logic_vector(1 downto 0);
+signal finalExc :  std_logic_vector(1 downto 0);
+begin
+   sign <= X(31) xor Y(31);
+   expX <= X(30 downto 23);
+   expY <= Y(30 downto 23);
+   expSumPreSub <= ("00" & expX) + ("00" & expY);
+   bias <= CONV_STD_LOGIC_VECTOR(127,10);
+   expSum <= expSumPreSub - bias;
+   sigX <= "1" & X(22 downto 0);
+   sigY <= "1" & Y(22 downto 0);
+   SignificandMultiplication: IntMultiplier_UsingDSP_24_24_48_unsigned_comb_uid4
+      port map ( R => sigProd,
+                 X => sigX,
+                 Y => sigY);
+   excSel <= X(33 downto 32) & Y(33 downto 32);
+   with excSel select 
+   exc <= "00" when  "0000" | "0001" | "0100", 
+          "01" when "0101",
+          "10" when "0110" | "1001" | "1010" ,
+          "11" when others;
+   norm <= sigProd(47);
+   -- exponent update
+   expPostNorm <= expSum + ("000000000" & norm);
+   -- significand normalization shift
+   sigProdExt <= sigProd(46 downto 0) & "0" when norm='1' else
+                         sigProd(45 downto 0) & "00";
+   expSig <= expPostNorm & sigProdExt(47 downto 25);
+   sticky <= sigProdExt(24);
+   guard <= '0' when sigProdExt(23 downto 0)="000000000000000000000000" else '1';
+   round <= sticky and ( (guard and not(sigProdExt(25))) or (sigProdExt(25) ))  ;
+      RoundingAdder: IntAdder_33_f400_uid25
+      port map ( Cin => round,
+                 R => expSigPostRound,
+                 X => expSig,
+                 Y => "000000000000000000000000000000000");
+   with expSigPostRound(32 downto 31) select
+   excPostNorm <=  "01"  when  "00",
+                               "10"             when "01", 
+                               "00"             when "11"|"10",
+                               "11"             when others;
+   with exc select 
+   finalExc <= exc when  "11"|"10"|"00",
+                       excPostNorm when others; 
+   R <= finalExc & sign & expSigPostRound(30 downto 0);
+end architecture;
+
+---
+----------------------------------------------------------------------------------
+-- Componente 7: FPMult_32bit_Wrapper (NOVA ENTIDADE TOP-LEVEL)
+--
+-- Esta entidade "empacota" os conversores e o núcleo multiplicador.
+-- Use esta como a entidade de nível superior em seu projeto/simulação.
+----------------------------------------------------------------------------------
+library ieee;
+use ieee.std_logic_1164.all;
+
+entity FPMult_32bit_Wrapper is
+    port (
+        -- Entradas padrão IEEE 754 (32 bits)
+        X_in  : in  std_logic_vector(31 downto 0);
+        Y_in  : in  std_logic_vector(31 downto 0);
+        
+        -- Saída padrão IEEE 754 (32 bits)
+        R_out : out std_logic_vector(31 downto 0)
+    );
+end entity FPMult_32bit_Wrapper;
+
+architecture Structural of FPMult_32bit_Wrapper is
+
+    -- Sinais internos para conectar os blocos no formato FloPoCo (34 bits)
+    signal s_X_internal : std_logic_vector(33 downto 0);
+    signal s_Y_internal : std_logic_vector(33 downto 0);
+    signal s_R_internal : std_logic_vector(33 downto 0);
+
+    -- Declaração dos 3 componentes principais que vamos instanciar
+
+    -- Componente 1: Conversor de Entrada
+    component InputIEEE_8_23_to_8_23
+       port ( X : in  std_logic_vector(31 downto 0);
+              R : out  std_logic_vector(33 downto 0) );
+    end component;
+
+    -- Componente 2: Núcleo Multiplicador
+    component FPMult_8_23_8_23_8_23_comb_uid2
+       port ( X : in  std_logic_vector(33 downto 0);
+              Y : in  std_logic_vector(33 downto 0);
+              R : out  std_logic_vector(33 downto 0) );
+    end component;
+
+    -- Componente 3: Conversor de Saída
+    component OutputIEEE_8_23_to_8_23
+       port ( X : in  std_logic_vector(33 downto 0);
+              R : out  std_logic_vector(31 downto 0) );
+    end component;
+
+begin
+
+    -- 1. Converte a entrada X (32-bit IEEE) para o formato interno (34-bit)
+    u_Input_X: InputIEEE_8_23_to_8_23
+        port map (
+            X => X_in,
+            R => s_X_internal
+        );
+
+    -- 2. Converte a entrada Y (32-bit IEEE) para o formato interno (34-bit)
+    u_Input_Y: InputIEEE_8_23_to_8_23
+        port map (
+            X => Y_in,
+            R => s_Y_internal
+        );
+
+    -- 3. Executa a multiplicação usando o núcleo de 34-bit
+    u_FPMult_Core: FPMult_8_23_8_23_8_23_comb_uid2
+        port map (
+            X => s_X_internal,
+            Y => s_Y_internal,
+            R => s_R_internal
+        );
+
+    -- 4. Converte o resultado interno (34-bit) de volta para IEEE (32-bit)
+    u_Output_R: OutputIEEE_8_23_to_8_23
+        port map (
+            X => s_R_internal,
+            R => R_out
+        );
+
+end architecture Structural;
