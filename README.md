@@ -5,6 +5,9 @@
 - Rafael Furletti
 - Gabriel Elan
 
+### Link do repositório
+https://github.com/UserZeca/ProcessadorMIPS/tree/main
+
 # Trabalho de Arquitetura e Organização de Computadores
 
 Esse trabalho tem como objetivo principal o projeto e a implementação de um processador MIPS de 32 bits.
