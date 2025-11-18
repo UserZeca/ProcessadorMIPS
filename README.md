@@ -56,7 +56,7 @@ addi $a0, $zero, 20  # $a0 = endereço base 20
 sw $t0, 0($a0)       # Salva 1.0 em mem[20]
 sw $t1, 4($a0)       # Salva 2.0 em mem[24]
 
-# Agora, a FPU lê da memória
+#Agora, a FPU lê da memória
 l.s $f4, 0($a0)      # Carrega 1.0 em $f4
 l.s $f5, 4($a0)      # Carrega 2.0 em $f5
 
