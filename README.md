@@ -44,15 +44,15 @@ Otimização para FPGAs: O FloPoCo é um gerador de cores focado em otimizar a r
 Conversão para 32 bits
 Como o formato de 34 bits é interno do FloPoCo, é necessária uma etapa de conversão na saída da FPU. Esta conversão combina os 2 bits de exceção (exn) com os 32 bits numéricos para gerar o padrão final de 32 bits IEEE-754, garantindo a interoperabilidade com outros componentes do processador.
 
-## Código gravado na nossa ROM
+### Código gravado na nossa ROM
 
 ´´´
-# Carrega os valores float (como hex) nos registradores de inteiros
+#Carrega os valores float (como hex) nos registradores de inteiros
 lui $t0, 0x3F80      # $t0 = 1.0 (float)
 lui $t1, 0x4000      # $t1 = 2.0 (float)
 addi $a0, $zero, 20  # $a0 = endereço base 20
 
-# Salva os floats na Memória de Dados
+#Salva os floats na Memória de Dados
 sw $t0, 0($a0)       # Salva 1.0 em mem[20]
 sw $t1, 4($a0)       # Salva 2.0 em mem[24]
 
@@ -60,7 +60,7 @@ sw $t1, 4($a0)       # Salva 2.0 em mem[24]
 l.s $f4, 0($a0)      # Carrega 1.0 em $f4
 l.s $f5, 4($a0)      # Carrega 2.0 em $f5
 
-# Agora, o teste de ALU funciona
+#Agora, o teste de ALU funciona
 add.s $f4, $f4, $f5  # $f4 = 3.0
 
 ´´´
